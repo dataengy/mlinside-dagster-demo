@@ -1,0 +1,15 @@
+name: dbt_demo
+version: "1.0.0"
+profile: dbt_demo
+model-paths: ["models"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  dbt_demo:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table

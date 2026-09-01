@@ -1,0 +1,18 @@
+# Состояние, которое воспроизводится командой `just reset` — в репозиторий не кладём.
+.venv/
+__pycache__/
+*.pyc
+.dagster_home/
+dbt_demo/target/
+dbt_demo/logs/
+dbt_demo/dbt_packages/
+data/warehouse.duckdb
+data/mlflow.db
+data/mlruns/
+mlruns/
+dbt_demo/.user.yml
+
+# Исходные CSV и parquet — НАОБОРОТ, лежат в репозитории: демо не должно
+# ничего генерировать и ничего скачивать на камере.
+!data/raw/*.csv
+!data/features*.parquet

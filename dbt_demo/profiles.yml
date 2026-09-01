@@ -1,0 +1,8 @@
+# DuckDB-файл лежит рядом с проектом — никакой внешней базы демо не требует.
+dbt_demo:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DBT_DEMO_DUCKDB', '../data/warehouse.duckdb') }}"
+      threads: 4

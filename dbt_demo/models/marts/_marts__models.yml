@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: feature_mart
+    description: |
+      Витрина признаков для обучения. Тесты этой модели приезжают в Dagster
+      как asset checks — именно это показывается в DEMO 2.
+    columns:
+      - name: order_id
+        description: Ключ заказа.
+        tests: [not_null, unique]
+      - name: target
+        description: Целевая переменная (1 — долгая доставка).
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+      - name: freight_ratio
+        description: Доля доставки в стоимости заказа.
+        tests: [not_null]
