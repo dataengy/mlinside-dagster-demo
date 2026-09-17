@@ -31,18 +31,32 @@
 **Нет.** Ни одного маркера `TODO` / `FIXME` / `XXX` в исходниках, доках, `Justfile` и dbt-моделях;
 незакоммиченных изменений нет; неотправленных коммитов нет.
 
-## Состояние стенда на диске
+## Состояние стенда
 
-Стенд подготовлен к записи и находится в состоянии «до демо»:
+Стенд подготовлен к записи и находится в состоянии «до демо». Проверено **на живом инстансе**:
+`uv sync` → `just reset` → `just dev` отработали, webserver слушает `http://127.0.0.1:3111`.
 
-- `just reset` отработал — `data/warehouse.duckdb` и `data/features.parquet` на месте,
-  `dbt_demo/target/manifest.json` собран;
-- ничего не материализовано — `data/mlflow.db` и `data/mlruns/` отсутствуют;
-- `.dagster_home/` создан, интерфейс `just dev` уже поднимался.
+Запрос к GraphQL работающего Dagster подтверждает:
 
-Проверка на этой сессии: `dagster definitions validate -m dagster_demo.definitions` —
-**Validation successful**, все code locations проходят. `just smoke` намеренно **не** запускался:
-он материализует весь граф и сломал бы состояние «до демо».
+- code location `mlinside-dagster-demo` загружен, **13 ассетов** в 5 группах —
+  `quickstart` (3), `raw` (2), `staging` (2), `intermediate` (1), `marts` (1), `ml` (4);
+- **материализовано 0 из 13** — состояние «до демо» нетронуто;
+- зарегистрировано **7 asset checks**, из них 5 на `feature_mart`
+  (`unique_*`/`not_null_*`/`accepted_values_*`) — это те самые тесты dbt, приехавшие
+  через `dbt build` без единой проверки, написанной руками. Главный эффект DEMO 2 — на месте.
+
+Оба стыка графа, на которых держится лекция, целы:
+
+| Стык | Рёбра в живом графе | Что сломалось бы |
+|---|---|---|
+| ингест ↔ dbt sources | `stg_orders ← raw_orders`, `stg_items ← raw_items` | DEMO 2: dbt-слой оторвался бы от ингеста |
+| dbt ↔ ML | `training_dataset ← feature_mart` | DEMO 3: граф распался бы на два куска |
+
+Дополнительно: `dagster definitions validate -m dagster_demo.definitions` — **Validation successful**.
+
+`just smoke` намеренно **не** запускался: он материализует весь граф (0/13 → 13/13), а
+последующий `just reset` удаляет `.dagster_home` у работающего `dg dev` и потребует
+перезапуска сервера. Решение о прогоне — за человеком, см. пункт 1 в [`TODO.md`](TODO.md).
 
 ## Что дальше
 
